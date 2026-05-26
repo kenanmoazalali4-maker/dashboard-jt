@@ -7,7 +7,7 @@ export async function GET() {
   if (!(session as any)?.staff) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const players = await prisma.player.findMany({ orderBy: { id: "desc" }, take: 500 });
+    const players = await prisma.$queryRawUnsafe("SELECT * FROM players ORDER BY id DESC LIMIT 500");
     return NextResponse.json({ players });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
