@@ -3,6 +3,7 @@ import Discord from "next-auth/providers/discord";
 import prisma from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     Discord({
       clientId: process.env.AUTH_DISCORD_ID!,
