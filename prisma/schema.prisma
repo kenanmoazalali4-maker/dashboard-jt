@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// Dashboard Custom Tables ONLY
+// QBCore tables are accessed via raw SQL queries
+// =============================================
+
+model DashboardStaff {
+  id          Int      @id @default(autoincrement())
+  discordId   String   @unique @map("discord_id") @db.VarChar(32)
+  username    String?  @db.VarChar(64)
+  avatar      String?  @db.VarChar(512)
+  permissions String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  applications DashboardApplication[] @relation("ReviewedApplications")
+  auditLogs    DashboardAuditLog[]
+
+  @@map("dashboard_staff")
+}
+
+model DashboardApplication {
+  id              Int      @id @default(autoincrement())
+  applicantName   String   @map("applicant_name") @db.VarChar(128)
+  applicantDiscord String? @map("applicant_discord") @db.VarChar(32)
+  applicantAge    Int?     @map("applicant_age")
+  answers         String?  @db.LongText
+  status          String   @default("pending") @db.VarChar(20)
+  reviewerId      Int?     @map("reviewer_id")
+  reviewerNotes   String?  @map("reviewer_notes") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  reviewer        DashboardStaff? @relation("ReviewedApplications", fields: [reviewerId], references: [id])
+
+  @@map("dashboard_applications")
+}
+
+model DashboardAuditLog {
+  id         Int      @id @default(autoincrement())
+  staffId    Int      @map("staff_id")
+  action     String   @db.VarChar(64)
+  targetType String?  @map("target_type") @db.VarChar(32)
+  targetId   String?  @map("target_id") @db.VarChar(64)
+  details    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  staff      DashboardStaff @relation(fields: [staffId], references: [id])
+
+  @@map("dashboard_audit_log")
+}
+
+model DashboardSettings {
+  keyName   String   @id @map("key_name") @db.VarChar(64)
+  value     String   @db.Text
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("dashboard_settings")
+}
