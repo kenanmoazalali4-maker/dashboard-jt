@@ -9,7 +9,7 @@ export default async function CharactersPage() {
 
   let characters: any[] = [];
   try {
-    const raw = await getPlayers(500);
+    const raw = await getPlayers(0);
     characters = raw.map((p: any) => {
       let charinfo = null, money = null, job = null, gang = null;
       try { charinfo = p.charinfo ? JSON.parse(p.charinfo) : null; } catch {}

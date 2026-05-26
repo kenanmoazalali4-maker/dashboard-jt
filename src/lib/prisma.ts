@@ -15,9 +15,10 @@ export default prisma;
 // =============================================
 
 export async function getPlayers(limit = 200) {
-  const result: any[] = await prisma.$queryRawUnsafe(
-    `SELECT * FROM players ORDER BY id DESC LIMIT ${limit}`
-  );
+  const query = limit > 0
+    ? `SELECT * FROM players ORDER BY id DESC LIMIT ${limit}`
+    : `SELECT * FROM players ORDER BY id DESC`;
+  const result: any[] = await prisma.$queryRawUnsafe(query);
   return result;
 }
 
