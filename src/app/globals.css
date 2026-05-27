@@ -1280,6 +1280,14 @@ textarea {
 }
 
 /* ========== RESPONSIVE ========== */
+.mobile-menu-btn {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(100%);
@@ -1287,6 +1295,42 @@ textarea {
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 200;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: rgba(9, 30, 24, 0.9);
+    color: var(--text-primary);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(8px);
+    transition: all var(--transition);
+  }
+
+  .mobile-menu-btn:hover {
+    background: rgba(15, 45, 36, 0.95);
+    border-color: var(--border-active);
+    color: var(--accent-cyan);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+    animation: fadeIn 0.25s ease;
   }
 
   .main-content {

@@ -113,25 +113,17 @@ export default function Sidebar({ staff }: SidebarProps) {
       <button
         className="mobile-menu-btn"
         onClick={() => setMobileOpen(!mobileOpen)}
-        style={{
-          position: "fixed",
-          top: 16,
-          right: 16,
-          zIndex: 200,
-          display: "none",
-          width: 40,
-          height: 40,
-          borderRadius: 8,
-          border: "1px solid rgba(75,85,99,0.3)",
-          background: "rgba(17,24,39,0.9)",
-          color: "#f3f4f6",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
+        aria-label="فتح القائمة"
       >
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
+
+      {mobileOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
       <aside className={`sidebar ${mobileOpen ? "open" : ""}`}>
         <div className="sidebar-header" style={{ padding: '20px 16px', borderBottom: '1px solid var(--glass-border)' }}>
