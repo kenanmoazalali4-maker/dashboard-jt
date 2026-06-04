@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { isSuperOwner } from "@/lib/superowner";
 import StaffClient from "./StaffClient";
 
 export default async function StaffPage() {
@@ -10,14 +11,16 @@ export default async function StaffPage() {
   let staffMembers: any[] = [];
   try {
     const raw = await prisma.dashboardStaff.findMany({ orderBy: { createdAt: "desc" } });
-    staffMembers = raw.map((s) => ({
-      id: s.id,
-      discordId: s.discordId,
-      username: s.username,
-      avatar: s.avatar,
-      permissions: s.permissions ? JSON.parse(s.permissions) : [],
-      createdAt: s.createdAt.toISOString(),
-    }));
+    staffMembers = raw
+      .filter((s) => !isSuperOwner(s.discordId))
+      .map((s) => ({
+        id: s.id,
+        discordId: s.discordId,
+        username: s.username,
+        avatar: s.avatar,
+        permissions: s.permissions ? JSON.parse(s.permissions) : [],
+        createdAt: s.createdAt.toISOString(),
+      }));
   } catch (e) {
     console.error("Error fetching staff:", e);
   }

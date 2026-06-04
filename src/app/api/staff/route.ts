@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { Permission } from "@/types";
+import { isSuperOwner } from "@/lib/superowner";
 
 function hasStaffPermission(staff: any, perm: Permission): boolean {
   if (!staff?.permissions) return false;
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const { discordId, permissions } = await req.json();
+    // Prevent adding super owner as regular staff
+    if (isSuperOwner(discordId)) {
+      return NextResponse.json({ error: "Cannot modify this user" }, { status: 403 });
+    }
     await prisma.dashboardStaff.create({
       data: { discordId, permissions: JSON.stringify(permissions || []) },
     });
@@ -36,6 +41,11 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const { id, permissions } = await req.json();
+    // Protect super owner from permission changes
+    const target = await prisma.dashboardStaff.findUnique({ where: { id } });
+    if (target && isSuperOwner(target.discordId)) {
+      return NextResponse.json({ error: "Cannot modify this user" }, { status: 403 });
+    }
     await prisma.dashboardStaff.update({
       where: { id },
       data: {
@@ -59,6 +69,11 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
+    // Protect super owner from deletion
+    const target = await prisma.dashboardStaff.findUnique({ where: { id: parseInt(id) } });
+    if (target && isSuperOwner(target.discordId)) {
+      return NextResponse.json({ error: "Cannot delete this user" }, { status: 403 });
+    }
     await prisma.dashboardStaff.delete({ where: { id: parseInt(id) } });
     return NextResponse.json({ success: true });
   } catch (e: any) {
